@@ -1,7 +1,7 @@
 def call() {
     script {
         // Retrieve the standard Traefik Docker network
-        def networkName = env.STANDARD_TRAEFIK_DOCKER_NETWORK
+        def networkName = STANDARD_TRAEFIK_DOCKER_NETWORK
         if (!networkName) {
             echo 'The STANDARD_TRAEFIK_DOCKER_NETWORK environment variable is not set.'
             
@@ -29,7 +29,7 @@ def call() {
             docker rm traefik || true
             docker run -d --name traefik \
                 --restart=unless-stopped \
-                --network="${env.STANDARD_TRAEFIK_DOCKER_NETWORK}" \
+                --network="${STANDARD_TRAEFIK_DOCKER_NETWORK}" \
                 -p 80:80 \
                 -p 8085:8080 \
                 -v /var/run/docker.sock:/var/run/docker.sock \
