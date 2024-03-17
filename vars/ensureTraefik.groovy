@@ -15,7 +15,7 @@ def call() {
         NETWORK_EXISTS=\$(docker network ls --filter 'name=^${STANDARD_TRAEFIK_DOCKER_NETWORK}\$' --format '{{.Name}}')
         if [ "\$NETWORK_EXISTS" != "${networkName}" ]; then
             echo "Creating Docker network: ${networkName}"
-            if docker network create ${networkName}; then
+            if docker network create ${STANDARD_TRAEFIK_DOCKER_NETWORK}; then
                 echo "Docker network created successfully."
             else
                 echo "Failed to create Docker network."
@@ -35,7 +35,7 @@ def call() {
             docker rm traefik || true
             if docker run -d --name traefik \\
                 --restart=unless-stopped \\
-                --network="${networkName}" \\
+                --network="${STANDARD_TRAEFIK_DOCKER_NETWORK}" \\
                 -p 80:80 \\
                 -p 8085:8080 \\
                 -v /var/run/docker.sock:/var/run/docker.sock \\
