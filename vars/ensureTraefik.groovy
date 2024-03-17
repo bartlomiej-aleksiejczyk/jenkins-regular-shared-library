@@ -9,7 +9,7 @@ def call() {
         echo "STANDARD_TRAEFIK_DOCKER_NETWORK: ${networkName}"
 
         // Check and create network if necessary
-        sh '''
+                sh '''
         #!/bin/bash
         # Check if the specified network exists
         NETWORK_EXISTS=$(docker network ls --filter name="^${STANDARD_TRAEFIK_DOCKER_NETWORK$}" --format '{{.Name}}')
