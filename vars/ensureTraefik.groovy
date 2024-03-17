@@ -4,8 +4,10 @@ def call() {
         def networkName = env.STANDARD_TRAEFIK_DOCKER_NETWORK
         if (!networkName) {
             echo 'The STANDARD_TRAEFIK_DOCKER_NETWORK environment variable is not set.'
+            
             return
         }
+        echo ${STANDARD_TRAEFIK_DOCKER_NETWORK}
 
         // Check and create network with given namme if necessary
         sh '''
