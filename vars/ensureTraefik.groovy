@@ -27,7 +27,7 @@ def call() {
         '''
 
         // Start the Traefik container
-        sh """
+        sh '''
         #!/bin/bash
         RUNNING=\$(docker ps --filter 'name=^/traefik$' --format '{{.Names}}')
         if [ "\$RUNNING" != "traefik" ]; then
@@ -51,6 +51,6 @@ def call() {
         else
             echo "Traefik container is already running."
         fi
-        """
+        '''
     }
 }
