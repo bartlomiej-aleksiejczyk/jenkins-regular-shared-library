@@ -12,12 +12,12 @@ def call() {
         // Check and create network with given namme if necessary
         sh '''
         # Check if the specified network exists
-        NETWORK_EXISTS=$(docker network ls --filter "name=^${networkName}$" --format "{{.Name}}")
+        NETWORK_EXISTS=$(docker network ls --filter "name=^${STANDARD_TRAEFIK_DOCKER_NETWORK}$" --format "{{.Name}}")
         if [ "$NETWORK_EXISTS" != "${networkName}" ]; then
-            echo "Creating Docker network: ${networkName}"
-            docker network create ${networkName}
+            echo "Creating Docker network: ${STANDARD_TRAEFIK_DOCKER_NETWORK}"
+            docker network create ${STANDARD_TRAEFIK_DOCKER_NETWORK}
         else
-            echo "Docker network '${networkName}' already exists."
+            echo "Docker network '${STANDARD_TRAEFIK_DOCKER_NETWORK}' already exists."
         fi
         '''
 
