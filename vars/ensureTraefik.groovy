@@ -12,9 +12,9 @@ def call() {
                 sh """
         #!/bin/bash
         # Check if the specified network exists
-        NETWORK_EXISTS=$(docker network ls --filter name='^${STANDARD_TRAEFIK_DOCKER_NETWORK}$' --format '{{.Name}}')
-        if [ "\$NETWORK_EXISTS" != "${networkName}" ]; then
-            echo "Creating Docker network: ${networkName}"
+        NETWORK_EXISTS=\$(docker network ls --filter name='^${STANDARD_TRAEFIK_DOCKER_NETWORK}\$' --format '{{.Name}}')
+        if [ "\$NETWORK_EXISTS" != "${STANDARD_TRAEFIK_DOCKER_NETWORK}" ]; then
+            echo "Creating Docker network: ${STANDARD_TRAEFIK_DOCKER_NETWORK}"
             if docker network create ${STANDARD_TRAEFIK_DOCKER_NETWORK}; then
                 echo "Docker network created successfully."
             else
@@ -22,7 +22,7 @@ def call() {
                 exit 1
             fi
         else
-            echo "Docker network '${networkName}' already exists."
+            echo "Docker network '${STANDARD_TRAEFIK_DOCKER_NETWORK}' already exists."
         fi
         """
 
