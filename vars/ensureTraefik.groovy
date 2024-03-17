@@ -9,10 +9,10 @@ def call() {
         echo "STANDARD_TRAEFIK_DOCKER_NETWORK: ${networkName}"
 
         // Check and create network if necessary
-                sh '''
+                sh """
         #!/bin/bash
         # Check if the specified network exists
-        NETWORK_EXISTS=$(docker network ls --filter name='^${STANDARD_TRAEFIK_DOCKER_NETWORK$}' --format '{{.Name}}')
+        NETWORK_EXISTS=$(docker network ls --filter name='^${STANDARD_TRAEFIK_DOCKER_NETWORK}$' --format '{{.Name}}')
         if [ "\$NETWORK_EXISTS" != "${networkName}" ]; then
             echo "Creating Docker network: ${networkName}"
             if docker network create ${STANDARD_TRAEFIK_DOCKER_NETWORK}; then
@@ -24,7 +24,7 @@ def call() {
         else
             echo "Docker network '${networkName}' already exists."
         fi
-        '''
+        """
 
         // Start the Traefik container
         sh '''
