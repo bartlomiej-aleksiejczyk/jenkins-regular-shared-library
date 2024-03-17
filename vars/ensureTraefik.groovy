@@ -4,18 +4,22 @@ def call() {
         def networkName = STANDARD_TRAEFIK_DOCKER_NETWORK
         if (!networkName) {
             echo 'The STANDARD_TRAEFIK_DOCKER_NETWORK environment variable is not set.'
-            
             return
         }
-        echo STANDARD_TRAEFIK_DOCKER_NETWORK
+        echo "STANDARD_TRAEFIK_DOCKER_NETWORK: ${networkName}"
 
-        // Check and create network with given namme if necessary
+        // Check and create network if necessary
         sh '''
         # Check if the specified network exists
         NETWORK_EXISTS=$(docker network ls --filter "name=^${STANDARD_TRAEFIK_DOCKER_NETWORK}$" --format "{{.Name}}")
         if [ "$NETWORK_EXISTS" != "${networkName}" ]; then
             echo "Creating Docker network: ${STANDARD_TRAEFIK_DOCKER_NETWORK}"
-            docker network create ${STANDARD_TRAEFIK_DOCKER_NETWORK}
+            if docker network create ${STANDARD_TRAEFIK_DOCKER_NETWORK}; then
+                echo "Docker network created successfully."
+            else
+                echo "Failed to create Docker network."
+                exit 1
+            fi
         else
             echo "Docker network '${STANDARD_TRAEFIK_DOCKER_NETWORK}' already exists."
         fi
@@ -27,7 +31,7 @@ def call() {
         if [ "$RUNNING" != "traefik" ]; then
             echo "Starting Traefik container..."
             docker rm traefik || true
-            docker run -d --name traefik \
+            if docker run -d --name traefik \
                 --restart=unless-stopped \
                 --network="${STANDARD_TRAEFIK_DOCKER_NETWORK}" \
                 -p 80:80 \
@@ -36,7 +40,12 @@ def call() {
                 traefik:v3.0 \
                 --api.insecure=true \
                 --providers.docker \
-                --entrypoints.web.address=:80
+                --entrypoints.web.address=:80; then
+                echo "Traefik container started successfully."
+            else
+                echo "Failed to start Traefik container."
+                exit 1
+            fi
         else
             echo "Traefik container is already running."
         fi
