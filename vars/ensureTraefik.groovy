@@ -7,7 +7,7 @@ def call() {
             
             return
         }
-        echo ${STANDARD_TRAEFIK_DOCKER_NETWORK}
+        echo STANDARD_TRAEFIK_DOCKER_NETWORK
 
         // Check and create network with given namme if necessary
         sh '''
