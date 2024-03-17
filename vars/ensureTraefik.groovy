@@ -31,7 +31,7 @@ def call() {
                 -p 80:80 \
                 -p 8085:8080 \
                 -v /var/run/docker.sock:/var/run/docker.sock \
-                traefik:v2.5 \
+                traefik:v3.0 \
                 --api.insecure=true \
                 --providers.docker \
                 --entrypoints.web.address=:80
