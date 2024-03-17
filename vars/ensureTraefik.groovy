@@ -1,53 +1,45 @@
 def call() {
     script {
-        def networkName = env.STANDARD_TRAEFIK_DOCKER_NETWORK
+        // Retrieve the standard Traefik Docker network
+        def networkName = STANDARD_TRAEFIK_DOCKER_NETWORK
         if (!networkName) {
             echo 'The STANDARD_TRAEFIK_DOCKER_NETWORK environment variable is not set.'
+
             return
         }
-        echo "STANDARD_TRAEFIK_DOCKER_NETWORK: ${networkName}"
+        echo STANDARD_TRAEFIK_DOCKER_NETWORK
 
-        sh """
-        #!/bin/bash
+        // Check and create network with given namme if necessary
+        sh '''
         # Check if the specified network exists
-        NETWORK_EXISTS=\$(docker network ls --filter "name=^${networkName}" --format "{{ '{{.Name}}' }}")  # Fixed line
-        if [ "\$NETWORK_EXISTS" != "${networkName}" ]; then  # Escaped for Groovy, but normal for bash
-            echo "Creating Docker network: ${networkName}"
-            if docker network create ${networkName}; then
-                echo "Docker network created successfully."
-            else
-                echo "Failed to create Docker network."
-                exit 1
-            fi
+        NETWORK_EXISTS=$(docker network ls --filter "name=^${STANDARD_TRAEFIK_DOCKER_NETWORK}{$}" --format "{{.Name}}")
+        if [ "$NETWORK_EXISTS" != "${networkName}" ]; then
+            echo "Creating Docker network: ${STANDARD_TRAEFIK_DOCKER_NETWORK}"
+            docker network create ${STANDARD_TRAEFIK_DOCKER_NETWORK}
         else
-            echo "Docker network '${networkName}' already exists."
+            echo "Docker network '${STANDARD_TRAEFIK_DOCKER_NETWORK}' already exists."
         fi
-        """
+        '''
 
-        sh """
-        #!/bin/bash
-        RUNNING=\$(docker ps --filter "name=^/traefik$" --format "{{ '{{.Names}}' }}")  # Fixed line
-        if [ "\$RUNNING" != "traefik" ]; then  # Escaped for Groovy, but normal for bash
+        // Start the Traefik container
+        sh '''
+        RUNNING=$(docker ps --filter "name=^/traefik$" --format "{{.Names}}")
+        if [ "$RUNNING" != "traefik" ]; then
             echo "Starting Traefik container..."
             docker rm traefik || true
-            if docker run -d --name traefik \\
-                --restart=unless-stopped \\
-                --network="${networkName}" \\
-                -p 80:80 \\
-                -p 8085:8080 \\
-                -v /var/run/docker.sock:/var/run/docker.sock \\
-                traefik:v3.0 \\
-                --api.insecure=true \\
-                --providers.docker \\
-                --entrypoints.web.address=:80; then
-                echo "Traefik container started successfully."
-            else
-                echo "Failed to start Traefik container."
-                exit 1
-            fi
+            docker run -d --name traefik \
+                --restart=unless-stopped \
+                --network="${STANDARD_TRAEFIK_DOCKER_NETWORK}" \
+                -p 80:80 \
+                -p 8085:8080 \
+                -v /var/run/docker.sock:/var/run/docker.sock \
+                traefik:v3.0 \
+                --api.insecure=true \
+                --providers.docker \
+                --entrypoints.web.address=:80
         else
             echo "Traefik container is already running."
         fi
-        """
+        '''
     }
 }
