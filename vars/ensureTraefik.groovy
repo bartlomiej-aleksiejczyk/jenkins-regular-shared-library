@@ -1,19 +1,17 @@
 def call() {
     script {
-        // Retrieve the standard Traefik Docker network
-        def networkName = env.STANDARD_TRAEFIK_DOCKER_NETWORK // Use environment variable correctly
+        def networkName = env.STANDARD_TRAEFIK_DOCKER_NETWORK
         if (!networkName) {
             echo 'The STANDARD_TRAEFIK_DOCKER_NETWORK environment variable is not set.'
             return
         }
         echo "STANDARD_TRAEFIK_DOCKER_NETWORK: ${networkName}"
 
-        // Check and create network if necessary
         sh """
         #!/bin/bash
         # Check if the specified network exists
-        NETWORK_EXISTS=\$(docker network ls --filter "name=^${networkName}\$5" --format "{{ '{{.Name}}' }}")
-        if [ "\$NETWORK_EXISTS" != "${networkName}" ]; then
+        NETWORK_EXISTS=\$(docker network ls --filter "name=^${networkName}" --format "{{ '{{.Name}}' }}")  # Fixed line
+        if [ "\$NETWORK_EXISTS" != "${networkName}" ]; then  # Escaped for Groovy, but normal for bash
             echo "Creating Docker network: ${networkName}"
             if docker network create ${networkName}; then
                 echo "Docker network created successfully."
@@ -26,11 +24,10 @@ def call() {
         fi
         """
 
-        // Start the Traefik container
         sh """
         #!/bin/bash
-        RUNNING=\$(docker ps --filter "name=^/traefik$" --format "{{ '{{.Names}}' }}")
-        if [ "\$RUNNING" != "traefik" ]; then
+        RUNNING=\$(docker ps --filter "name=^/traefik$" --format "{{ '{{.Names}}' }}")  # Fixed line
+        if [ "\$RUNNING" != "traefik" ]; then  # Escaped for Groovy, but normal for bash
             echo "Starting Traefik container..."
             docker rm traefik || true
             if docker run -d --name traefik \\
